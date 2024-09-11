@@ -22,6 +22,7 @@ class OpenPoseEditor {
             formData.append('overwrite', 'true')
             formData.append('type', 'temp')
             formData.append('subfolder', '3dposeeditor')
+            formData.append('kind', 'Image')
 
             const resp = await fetch('/upload/image', {
                 method: 'POST',
@@ -33,8 +34,8 @@ class OpenPoseEditor {
 
                 console.log("[3D Pose Editor] Upload image success.", data.name)
 
-                image.options.value = data.name
-                image.value = data.name
+                image.options.value = data.url
+                image.value = data.url
             }
         }
     }
@@ -146,7 +147,7 @@ function createOpenPoseEditor(node, inputName, inputData, app) {
         node.isMakingImages = true
         postMessage({
             cmd: 'openpose-3d',
-            method: 'MakeImages',
+            method: 'MakeImages_2',
             type: 'call',
             payload: null,
         })
@@ -219,6 +220,7 @@ function createOpenPoseEditor(node, inputName, inputData, app) {
             waitForElement(node.openposeeditor.iframe.contentDocument.body, "canvas", true),
             timeout(5000)
         ]).then(() => {
+            node.isMakingImages = true
             postMessage({
                 cmd: 'openpose-3d',
                 method: 'MakeImages',

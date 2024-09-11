@@ -8,6 +8,9 @@ from PIL import Image, ImageOps
 import torch
 import numpy as np
 import folder_paths
+import io
+from util.all import lg
+import requests
 
 # Directory node save settings
 CHUNK_SIZE = 1024
@@ -45,34 +48,40 @@ class PoseEditor3D(object):
     def output_pose(self, pose=None, depth=None, normal=None, canny=None):
         if pose is None:
             return (None, None, None, None,)
+        
+        # temp_dir = folder_paths.get_temp_directory()
+        # temp_dir = os.path.join(temp_dir, '3dposeeditor')
 
-        temp_dir = folder_paths.get_temp_directory()
-        temp_dir = os.path.join(temp_dir, '3dposeeditor')
-
-        image_path = os.path.join(temp_dir, pose)
-
-        i = Image.open(image_path)
+        # image_path = os.path.join(temp_dir, pose)
+        
+        # original_pil = Image.open(io.BytesIO(original_image_response.content))
+        image = requests.get(pose).content
+        
+        i = Image.open(io.BytesIO(image))
         poseImage = i.convert("RGB")
         poseImage = np.array(poseImage).astype(np.float32) / 255.0
         poseImage = torch.from_numpy(poseImage)[None,]
 
-        image_path = os.path.join(temp_dir, depth)
+        # image_path = os.path.join(temp_dir, depth)
+        image = requests.get(depth).content
 
-        i = Image.open(image_path)
+        i = Image.open(io.BytesIO(image))
         depthImage = i.convert("RGB")
         depthImage = np.array(depthImage).astype(np.float32) / 255.0
         depthImage = torch.from_numpy(depthImage)[None,]
 
-        image_path = os.path.join(temp_dir, normal)
+        # image_path = os.path.join(temp_dir, normal)
+        image = requests.get(normal).content
 
-        i = Image.open(image_path)
+        i = Image.open(io.BytesIO(image))
         normalImage = i.convert("RGB")
         normalImage = np.array(normalImage).astype(np.float32) / 255.0
         normalImage = torch.from_numpy(normalImage)[None,]
 
-        image_path = os.path.join(temp_dir, canny)
+        # image_path = os.path.join(temp_dir, canny)
+        image = requests.get(canny).content
 
-        i = Image.open(image_path)
+        i = Image.open(io.BytesIO(image))
         cannyImage = i.convert("RGB")
         cannyImage = np.array(cannyImage).astype(np.float32) / 255.0
         cannyImage = torch.from_numpy(cannyImage)[None,]
